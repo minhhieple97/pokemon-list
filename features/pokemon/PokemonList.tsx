@@ -1,4 +1,4 @@
-import PokemonCard from '@/components/pokemon/PokemonCard';
+import PokemonCard from '@/features/pokemon/PokemonCard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { fetchPokemonData } from '@/lib/pokemon';
 

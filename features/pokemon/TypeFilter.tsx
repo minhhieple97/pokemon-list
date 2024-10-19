@@ -1,4 +1,4 @@
-import { Skeleton } from '../ui/skeleton';
+import { Skeleton } from '../../components/ui/skeleton';
 import { TypeList } from './TypeList';
 import { getPokemonTypes } from '@/lib/pokemon';
 

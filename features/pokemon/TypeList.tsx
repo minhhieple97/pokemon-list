@@ -1,28 +1,16 @@
 'use client';
 
-import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { PokemonType } from '@/types';
+import { useTypeFilter } from './hooks/useTypeFilter';
 
 interface TypeListProps {
   types: PokemonType[];
   selectedType: string | null;
 }
 
-export function TypeList({ types, selectedType }: TypeListProps) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-
-  const onTypeChange = (type: string | null) => {
-    const params = new URLSearchParams(searchParams);
-    if (type) {
-      params.set('type', type);
-    } else {
-      params.delete('type');
-    }
-    params.set('page', '1');
-    router.push(`/?${params.toString()}`);
-  };
+export function TypeList({ types }: TypeListProps) {
+  const { selectedType, setTypeFilter } = useTypeFilter();
 
   return (
     <div className="mb-4">
@@ -30,7 +18,7 @@ export function TypeList({ types, selectedType }: TypeListProps) {
         {types.map((type) => (
           <Button
             key={type.name}
-            onClick={() => onTypeChange(type.name)}
+            onClick={() => setTypeFilter(type.name)}
             variant={selectedType === type.name ? 'secondary' : 'outline'}
           >
             {type.name}
@@ -39,7 +27,7 @@ export function TypeList({ types, selectedType }: TypeListProps) {
       </div>
       {selectedType && (
         <Button
-          onClick={() => onTypeChange(null)}
+          onClick={() => setTypeFilter(null)}
           variant="destructive"
           className="w-full sm:w-auto"
         >
