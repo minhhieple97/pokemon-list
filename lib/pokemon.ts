@@ -1,7 +1,5 @@
+import { API_BASE_URL, ITEMS_PER_PAGE } from '@/constants';
 import { PokemonType, PokemonListResponse, PokemonTypeResponse, FormattedPokemon } from '@/types';
-
-const API_BASE_URL = 'https://pokeapi.co/api/v2';
-const ITEMS_PER_PAGE = 20;
 
 export async function getPokemonTypes(): Promise<PokemonType[]> {
   const response = await fetch(`${API_BASE_URL}/type`);
