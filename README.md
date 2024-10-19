@@ -27,8 +27,10 @@ The project follows a standard Next.js 14 structure with the App Router:
 - `app/`: Contains the main application pages and layouts
 - `components/`: Reusable React components
   - `common/`: General-purpose components
-  - `pokemon/`: Pokémon-specific components
   - `ui/`: UI components (buttons, cards, etc.)
+- `constants/`: Constant values used throughout the application
+- `features/`: Feature-specific components and logic
+  - `pokemon/`: Pokemon-specific components and hooks
 - `lib/`: Utility functions and API calls
 - `types/`: TypeScript type definitions
 
