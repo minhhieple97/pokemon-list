@@ -2,11 +2,7 @@
 
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-
-interface PokemonType {
-  name: string;
-  url: string;
-}
+import { PokemonType } from '@/types';
 
 interface TypeListProps {
   types: PokemonType[];
@@ -29,19 +25,25 @@ export function TypeList({ types, selectedType }: TypeListProps) {
   };
 
   return (
-    <div className="mb-4 flex flex-wrap gap-2">
-      {types.map((type) => (
-        <Button
-          key={type.name}
-          onClick={() => onTypeChange(type.name)}
-          variant={selectedType === type.name ? 'secondary' : 'outline'}
-        >
-          {type.name}
-        </Button>
-      ))}
+    <div className="mb-4">
+      <div className="flex flex-wrap gap-2 mb-2">
+        {types.map((type) => (
+          <Button
+            key={type.name}
+            onClick={() => onTypeChange(type.name)}
+            variant={selectedType === type.name ? 'secondary' : 'outline'}
+          >
+            {type.name}
+          </Button>
+        ))}
+      </div>
       {selectedType && (
-        <Button onClick={() => onTypeChange(null)} variant="outline">
-          Reset
+        <Button
+          onClick={() => onTypeChange(null)}
+          variant="destructive"
+          className="w-full sm:w-auto"
+        >
+          Reset Filter
         </Button>
       )}
     </div>
