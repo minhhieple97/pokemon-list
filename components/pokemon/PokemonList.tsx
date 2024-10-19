@@ -2,18 +2,6 @@ import PokemonCard from '@/components/pokemon/PokemonCard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { fetchPokemonData } from '@/lib/pokemon';
 
-interface Pokemon {
-  name: string;
-  url: string;
-  id: number;
-  image: string;
-}
-
-interface PokemonListProps {
-  pokemon: Pokemon[];
-  totalCount: number;
-}
-
 interface PokemonSearchProps {
   type: string | null;
   page: number;
