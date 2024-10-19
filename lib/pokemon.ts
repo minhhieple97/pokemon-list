@@ -1,54 +1,69 @@
-export async function getPokemonTypes() {
-  const response = await fetch('https://pokeapi.co/api/v2/type');
-  const data = await response.json();
+import { PokemonType, PokemonListResponse, PokemonTypeResponse, FormattedPokemon } from '@/types';
+
+const API_BASE_URL = 'https://pokeapi.co/api/v2';
+const ITEMS_PER_PAGE = 20;
+
+export async function getPokemonTypes(): Promise<PokemonType[]> {
+  const response = await fetch(`${API_BASE_URL}/type`);
+  const data: PokemonListResponse = await response.json();
   return data.results;
 }
 
 export async function fetchPokemonData(page: number, type: string | null) {
-  const itemsPerPage = 20;
-  let url: string;
-  let totalCount: number;
-  let pokemonData: any[];
   try {
-    if (type) {
-      const response = await fetch(`https://pokeapi.co/api/v2/type/${type}`);
-      const data = await response.json();
-      totalCount = data.pokemon.length;
-      pokemonData = data.pokemon
-        .slice((page - 1) * itemsPerPage, page * itemsPerPage)
-        .map((p: { pokemon: any }) => p.pokemon);
-    } else {
-      url = `https://pokeapi.co/api/v2/pokemon?limit=${itemsPerPage}&offset=${
-        (page - 1) * itemsPerPage
-      }`;
-      const response = await fetch(url);
-      const data = await response.json();
-      totalCount = data.count;
-      pokemonData = data.results;
-    }
-
-    const formattedPokemon = await Promise.all(
-      pokemonData.map(async (p: any) => {
-        const id = parseInt(p.url.split('/').slice(-2, -1)[0]);
-        return {
-          ...p,
-          id,
-          image: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`,
-        };
-      }),
-    );
+    const { pokemonData, totalCount } = await fetchPokemonByTypeOrAll(page, type);
+    const formattedPokemon = await formatPokemonData(pokemonData);
 
     return {
       pokemon: formattedPokemon,
       totalCount,
-      totalPages: Math.ceil(totalCount / itemsPerPage),
+      totalPages: Math.ceil(totalCount / ITEMS_PER_PAGE),
     };
   } catch (error) {
     console.error('Error fetching Pokemon data:', error);
-    return {
-      pokemon: [],
-      totalCount: 0,
-      totalPages: 0,
-    };
+    return { pokemon: [], totalCount: 0, totalPages: 0 };
   }
+}
+
+async function fetchPokemonByTypeOrAll(page: number, type: string | null) {
+  if (type) {
+    return fetchPokemonByType(page, type);
+  }
+  return fetchAllPokemon(page);
+}
+
+async function fetchPokemonByType(page: number, type: string) {
+  const response = await fetch(`${API_BASE_URL}/type/${type}`);
+  const data: PokemonTypeResponse = await response.json();
+  const totalCount = data.pokemon.length;
+  const pokemonData = data.pokemon
+    .slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE)
+    .map((p) => p.pokemon);
+  return { pokemonData, totalCount };
+}
+
+async function fetchAllPokemon(page: number) {
+  const url = `${API_BASE_URL}/pokemon?limit=${ITEMS_PER_PAGE}&offset=${
+    (page - 1) * ITEMS_PER_PAGE
+  }`;
+  const response = await fetch(url);
+  const data: PokemonListResponse = await response.json();
+  return { pokemonData: data.results, totalCount: data.count };
+}
+
+async function formatPokemonData(pokemonData: PokemonType[]): Promise<FormattedPokemon[]> {
+  return Promise.all(
+    pokemonData.map(async (p) => {
+      const id = extractPokemonId(p.url);
+      return {
+        ...p,
+        id,
+        image: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`,
+      };
+    }),
+  );
+}
+
+function extractPokemonId(url: string): number {
+  return parseInt(url.split('/').slice(-2, -1)[0]);
 }
