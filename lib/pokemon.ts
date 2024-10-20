@@ -5,7 +5,6 @@ import {
   FormattedPokemon,
   BasicPokemonInfo,
   PokemonTypeDetailResponse,
-  PokemonInType,
 } from '@/types';
 
 export async function getPokemonTypes(): Promise<PokemonType[]> {
