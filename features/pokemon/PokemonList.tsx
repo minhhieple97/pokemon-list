@@ -3,12 +3,12 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { fetchPokemonData } from '@/lib/pokemon';
 
 interface PokemonSearchProps {
-  type: string | null;
+  types: number[];
   page: number;
 }
 
-export default async function PokemonList({ type, page }: PokemonSearchProps) {
-  const { pokemon, totalCount } = await fetchPokemonData(page, type);
+export default async function PokemonList({ types, page }: PokemonSearchProps) {
+  const { pokemon, totalCount } = await fetchPokemonData(page, types);
   return (
     <div>
       <p className="mb-4 text-sm text-gray-600 dark:text-gray-400">

@@ -3,12 +3,12 @@ import { TypeList } from './TypeList';
 import { getPokemonTypes } from '@/lib/pokemon';
 
 interface TypeFilterProps {
-  selectedType: string | null;
+  selectedTypes: number[];
 }
 
-export default async function TypeFilter({ selectedType }: TypeFilterProps) {
+export default async function TypeFilter({ selectedTypes }: TypeFilterProps) {
   const types = await getPokemonTypes();
-  return <TypeList types={types} selectedType={selectedType} />;
+  return <TypeList types={types} selectedTypes={selectedTypes} />;
 }
 
 export function TypeFilterSkeleton() {
