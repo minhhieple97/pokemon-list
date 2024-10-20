@@ -2,9 +2,14 @@
 
 This project is a Next.js application that displays a list of Pokémon with pagination and type filtering capabilities. It was created as part of a coding challenge to demonstrate proficiency in Next.js 14, TypeScript, and server-side components.
 
+## Live Demo
+
+You can view the live version of this project at [https://pokemon-list-pi-livid.vercel.app/](https://pokemon-list-pi-livid.vercel.app/)
+
 ## Features
 
-- Display a paginated list of Pokémon
+- Display a paginated list of Pokémon (20 per page)
+- Navigate through 66 pages of
 - Filter Pokémon by type
 - Server-side rendering for improved performance and SEO
 - Responsive design for various screen sizes
