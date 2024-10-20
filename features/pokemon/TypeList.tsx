@@ -6,11 +6,11 @@ import { useTypeFilter } from './hooks/useTypeFilter';
 
 interface TypeListProps {
   types: PokemonType[];
-  selectedType: string | null;
+  selectedTypes: number[];
 }
 
 export function TypeList({ types }: TypeListProps) {
-  const { selectedType, setTypeFilter } = useTypeFilter();
+  const { selectedTypes, setTypeFilter, removeTypeFilter } = useTypeFilter();
 
   return (
     <div className="mb-4">
@@ -18,19 +18,15 @@ export function TypeList({ types }: TypeListProps) {
         {types.map((type) => (
           <Button
             key={type.name}
-            onClick={() => setTypeFilter(type.name)}
-            variant={selectedType === type.name ? 'secondary' : 'outline'}
+            onClick={() => setTypeFilter(type.id)}
+            variant={selectedTypes.includes(type.id) ? 'secondary' : 'outline'}
           >
             {type.name}
           </Button>
         ))}
       </div>
-      {selectedType && (
-        <Button
-          onClick={() => setTypeFilter(null)}
-          variant="destructive"
-          className="w-full sm:w-auto"
-        >
+      {selectedTypes.length > 0 && (
+        <Button onClick={removeTypeFilter} variant="destructive" className="w-full sm:w-auto">
           Reset Filter
         </Button>
       )}

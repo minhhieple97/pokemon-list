@@ -8,30 +8,30 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 interface PokemonProps {
   page: number;
-  type: string | null;
+  types: number[];
 }
 
-export default async function Pokemon({ page, type }: PokemonProps) {
-  const pokemonData = await fetchPokemonData(page, type);
+export default async function Pokemon({ page, types }: PokemonProps) {
+  const pokemonData = await fetchPokemonData(page, types);
   const { totalPages, pokemon } = pokemonData;
 
   return (
     <>
       <Suspense fallback={<TypeFilterSkeleton />}>
-        <TypeFilter selectedType={type} />
+        <TypeFilter selectedTypes={types} />
       </Suspense>
       {pokemon.length === 0 ? (
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>No Pokémon Found</AlertTitle>
           <AlertDescription>
-            No Pokémon match the current filter criteria. Try changing the type or page.
+            No Pokémon match the current filter criteria. Try changing the types or page.
           </AlertDescription>
         </Alert>
       ) : (
         <>
-          <Suspense fallback={<PokemonListSkeleton />} key={`${type}-${page}`}>
-            <PokemonList type={type} page={page} />
+          <Suspense fallback={<PokemonListSkeleton />} key={`${types.join('-')}-${page}`}>
+            <PokemonList types={types} page={page} />
           </Suspense>
           <Pagination currentPage={page} totalPages={totalPages} />
         </>

@@ -1,17 +1,32 @@
-import { API_BASE_URL, ITEMS_PER_PAGE } from '@/constants';
-import { PokemonType, PokemonListResponse, PokemonTypeResponse, FormattedPokemon } from '@/types';
+import { API_BASE_URL, ITEMS_PER_PAGE, POKEMON_IMAGE_URL } from '@/constants';
+import {
+  PokemonType,
+  PokemonListResponse,
+  FormattedPokemon,
+  BasicPokemonInfo,
+  PokemonTypeDetailResponse,
+  PokemonInType,
+} from '@/types';
 
 export async function getPokemonTypes(): Promise<PokemonType[]> {
   const response = await fetch(`${API_BASE_URL}/type`);
   const data: PokemonListResponse = await response.json();
-  return data.results;
+
+  return data.results.map((type) => ({
+    ...type,
+    id: extractTypeId(type.url),
+  }));
 }
 
-export async function fetchPokemonData(page: number, type: string | null) {
-  try {
-    const { pokemonData, totalCount } = await fetchPokemonByTypeOrAll(page, type);
-    const formattedPokemon = await formatPokemonData(pokemonData);
+function extractTypeId(url: string): number {
+  const parts = url.split('/');
+  return parseInt(parts[parts.length - 2]);
+}
 
+export async function fetchPokemonData(page: number, types: number[]) {
+  try {
+    const { pokemonData, totalCount } = await fetchPokemonByTypesOrAll(page, types);
+    const formattedPokemon = formatPokemonData(pokemonData);
     return {
       pokemon: formattedPokemon,
       totalCount,
@@ -23,21 +38,41 @@ export async function fetchPokemonData(page: number, type: string | null) {
   }
 }
 
-async function fetchPokemonByTypeOrAll(page: number, type: string | null) {
-  if (type) {
-    return fetchPokemonByType(page, type);
+async function fetchPokemonByTypesOrAll(page: number, types: number[]) {
+  if (types.length > 0) {
+    return fetchPokemonByTypes(page, types);
   }
   return fetchAllPokemon(page);
 }
 
-async function fetchPokemonByType(page: number, type: string) {
-  const response = await fetch(`${API_BASE_URL}/type/${type}`);
-  const data: PokemonTypeResponse = await response.json();
-  const totalCount = data.pokemon.length;
-  const pokemonData = data.pokemon
-    .slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE)
+async function fetchPokemonByTypes(
+  page: number,
+  types: number[],
+): Promise<{ pokemonData: BasicPokemonInfo[]; totalCount: number }> {
+  const typeResponses: PokemonTypeDetailResponse[] = await Promise.all(
+    types.map((type) => fetch(`${API_BASE_URL}/type/${type}`).then((res) => res.json())),
+  );
+
+  const pokemonByType = typeResponses.map(
+    (response) => new Set(response.pokemon.map((p) => p.pokemon.name)),
+  );
+
+  const commonPokemon = pokemonByType.reduce(
+    (acc, curr) => new Set([...acc].filter((x) => curr.has(x))),
+  );
+
+  const uniquePokemon = typeResponses[0].pokemon
+    .filter((p) => commonPokemon.has(p.pokemon.name))
     .map((p) => p.pokemon);
-  return { pokemonData, totalCount };
+
+  const totalCount = uniquePokemon.length;
+  const startIndex = (page - 1) * ITEMS_PER_PAGE;
+  const pokemonData = uniquePokemon.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+  return {
+    pokemonData,
+    totalCount,
+  };
 }
 
 async function fetchAllPokemon(page: number) {
@@ -49,17 +84,15 @@ async function fetchAllPokemon(page: number) {
   return { pokemonData: data.results, totalCount: data.count };
 }
 
-async function formatPokemonData(pokemonData: PokemonType[]): Promise<FormattedPokemon[]> {
-  return Promise.all(
-    pokemonData.map(async (p) => {
-      const id = extractPokemonId(p.url);
-      return {
-        ...p,
-        id,
-        image: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`,
-      };
-    }),
-  );
+function formatPokemonData(pokemonData: BasicPokemonInfo[]): FormattedPokemon[] {
+  return pokemonData.map((p) => {
+    const id = extractPokemonId(p.url);
+    return {
+      ...p,
+      id,
+      image: `${POKEMON_IMAGE_URL}/${id}.png`,
+    };
+  });
 }
 
 function extractPokemonId(url: string): number {
