@@ -31,6 +31,9 @@ export default function PokemonCard({ pokemon }: PokemonCardProps) {
             height={150}
             className="w-full h-40 object-contain bg-gray-100 dark:bg-gray-800"
             onError={handleImageError}
+            loading="lazy"
+            placeholder="blur"
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+ip1sAAAAASUVORK5CYII="
           />
         ) : (
           <div className="w-full h-40 flex items-center justify-center bg-gray-200 dark:bg-gray-700">
