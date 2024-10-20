@@ -1,11 +1,11 @@
-import { API_BASE_URL, ITEMS_PER_PAGE, POKEMON_IMAGE_URL } from '@/constants';
+import { API_BASE_URL, ITEMS_PER_PAGE } from '@/constants';
 import {
   PokemonType,
   PokemonListResponse,
-  FormattedPokemon,
   BasicPokemonInfo,
   PokemonTypeDetailResponse,
 } from '@/types';
+import { extractTypeId, formatPokemonData } from './utils';
 
 export async function getPokemonTypes(): Promise<PokemonType[]> {
   const response = await fetch(`${API_BASE_URL}/type`);
@@ -15,11 +15,6 @@ export async function getPokemonTypes(): Promise<PokemonType[]> {
     ...type,
     id: extractTypeId(type.url),
   }));
-}
-
-function extractTypeId(url: string): number {
-  const parts = url.split('/');
-  return parseInt(parts[parts.length - 2]);
 }
 
 export async function fetchPokemonData(page: number, types: number[]) {
@@ -81,19 +76,4 @@ async function fetchAllPokemon(page: number) {
   const response = await fetch(url);
   const data: PokemonListResponse = await response.json();
   return { pokemonData: data.results, totalCount: data.count };
-}
-
-function formatPokemonData(pokemonData: BasicPokemonInfo[]): FormattedPokemon[] {
-  return pokemonData.map((p) => {
-    const id = extractPokemonId(p.url);
-    return {
-      ...p,
-      id,
-      image: `${POKEMON_IMAGE_URL}/${id}.png`,
-    };
-  });
-}
-
-function extractPokemonId(url: string): number {
-  return parseInt(url.split('/').slice(-2, -1)[0]);
 }
