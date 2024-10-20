@@ -13,7 +13,7 @@ interface PokemonProps {
 
 export default async function Pokemon({ page, types }: PokemonProps) {
   const pokemonData = await fetchPokemonData(page, types);
-  const { totalPages, pokemon } = pokemonData;
+  const { totalPages, pokemon, totalCount } = pokemonData;
 
   return (
     <>
@@ -31,7 +31,7 @@ export default async function Pokemon({ page, types }: PokemonProps) {
       ) : (
         <>
           <Suspense fallback={<PokemonListSkeleton />} key={`${types.join('-')}-${page}`}>
-            <PokemonList types={types} page={page} />
+            <PokemonList pokemon={pokemon} totalCount={totalCount} />
           </Suspense>
           <Pagination currentPage={page} totalPages={totalPages} />
         </>

@@ -1,14 +1,13 @@
 import PokemonCard from '@/features/pokemon/PokemonCard';
 import { Skeleton } from '@/components/ui/skeleton';
-import { fetchPokemonData } from '@/lib/pokemon';
+import { FormattedPokemon } from '@/types';
 
 interface PokemonSearchProps {
-  types: number[];
-  page: number;
+  pokemon: FormattedPokemon[];
+  totalCount: number;
 }
 
-export default async function PokemonList({ types, page }: PokemonSearchProps) {
-  const { pokemon, totalCount } = await fetchPokemonData(page, types);
+export default async function PokemonList({ pokemon, totalCount }: PokemonSearchProps) {
   return (
     <div>
       <p className="mb-4 text-sm text-gray-600 dark:text-gray-400">
