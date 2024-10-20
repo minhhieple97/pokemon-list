@@ -11,9 +11,37 @@ interface PokemonProps {
   types: number[];
 }
 
+const NoPokemonAlert = () => (
+  <Alert variant="destructive">
+    <AlertCircle className="h-4 w-4" />
+    <AlertTitle>No Pokémon Found</AlertTitle>
+    <AlertDescription>
+      No Pokémon match the current filter criteria. Try changing the types or page.
+    </AlertDescription>
+  </Alert>
+);
+
+const PokemonContent = ({
+  pokemon,
+  totalCount,
+  page,
+  totalPages,
+}: {
+  pokemon: any[];
+  totalCount: number;
+  page: number;
+  totalPages: number;
+}) => (
+  <>
+    <Suspense fallback={<PokemonListSkeleton />}>
+      <PokemonList pokemon={pokemon} totalCount={totalCount} />
+    </Suspense>
+    <Pagination currentPage={page} totalPages={totalPages} />
+  </>
+);
+
 export default async function Pokemon({ page, types }: PokemonProps) {
-  const pokemonData = await fetchPokemonData(page, types);
-  const { totalPages, pokemon, totalCount } = pokemonData;
+  const { totalPages, pokemon, totalCount } = await fetchPokemonData(page, types);
 
   return (
     <>
@@ -21,20 +49,14 @@ export default async function Pokemon({ page, types }: PokemonProps) {
         <TypeFilter selectedTypes={types} />
       </Suspense>
       {pokemon.length === 0 ? (
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>No Pokémon Found</AlertTitle>
-          <AlertDescription>
-            No Pokémon match the current filter criteria. Try changing the types or page.
-          </AlertDescription>
-        </Alert>
+        <NoPokemonAlert />
       ) : (
-        <>
-          <Suspense fallback={<PokemonListSkeleton />} key={`${types.join('-')}-${page}`}>
-            <PokemonList pokemon={pokemon} totalCount={totalCount} />
-          </Suspense>
-          <Pagination currentPage={page} totalPages={totalPages} />
-        </>
+        <PokemonContent
+          pokemon={pokemon}
+          totalCount={totalCount}
+          page={page}
+          totalPages={totalPages}
+        />
       )}
     </>
   );
